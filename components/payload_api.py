@@ -16,8 +16,13 @@ class PayloadAPI:
         with open(self.file_name, 'w') as file:
             json.dump(json_data, file)
 
-    def add_payload(self, path, value):
-        pass
+    def add_payload(self, key, value):
+        # Load data from file
+        json_data = self.read_payload_file()
+        # Append data
+        json_data.update({key: value})
+        # Write updated data to file
+        self.write_json_file(json_data)
 
     def delete_payload(self, path):
         pass

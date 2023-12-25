@@ -5,7 +5,7 @@ from base.components.client_api import ClientAPI
 from base.components.response_api import ResponseAPI
 from base.components.payload_api import PayloadAPI
 from base.components.helpers import *
-from components.git_token import GitToken
+from components.git_token_and_user import GitToken
 from components.json_locators import JsonLocators
 
 
@@ -30,9 +30,11 @@ def send_request(context, request_method, url):
         case 'post':
             context.response = ClientAPI(url, context).post_request()
         case 'patch':
-            pass
-        case 'delete':
-            context.response = ClientAPI(url, context).delete_request()
+            context.response = ClientAPI(url, context).patch_request()
+        case 'delete gist':
+            context.response = ClientAPI(url, context).delete_gist_request()
+        case 'delete repo':
+            context.response = ClientAPI(url, context).delete_repo_request()
         case _:
             pass
 
@@ -44,8 +46,8 @@ def send_request(context, request_method, url):
 
 
 @step("Load payload from {file_name} file")
-@step("Load payload from {file_name} file with updated values")
-def load_payload(context, file_name, values=None):
+@step("Load payload from {file_name} file with {action} values")
+def load_payload(context, file_name, action=None):
     """ load a payload with the option of updating it by JSONPath
     :param context:
     :param file_name:
@@ -57,7 +59,11 @@ def load_payload(context, file_name, values=None):
     context.file_name = full_file_name
 
     for path in context.json_path_value:
-        PayloadAPI(full_file_name).replace_payload(path, context.json_path_value[path])
+        match action.lower():
+            case 'updated':
+                PayloadAPI(full_file_name).replace_payload(path, context.json_path_value[path])
+            case 'added':
+                PayloadAPI(full_file_name).add_payload(path, context.json_path_value[path])
 
 
 @step("Verify response value")
