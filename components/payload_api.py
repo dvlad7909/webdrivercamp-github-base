@@ -27,7 +27,8 @@ class PayloadAPI:
     def delete_payload(self, path):
         pass
 
-    def replace_payload(self, path, value):
+    def replace_payload(self, short_path, value):
+        path = '$.' + short_path
         # Parse JSONPath expression
         expression = parse(path)
 
